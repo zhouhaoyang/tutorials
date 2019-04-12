@@ -113,7 +113,7 @@ cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=pred, label
 train_op = tf.train.AdamOptimizer(lr).minimize(cost)
 
 correct_pred = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
-accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
+accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32)) # 一行？正确率
 
 with tf.Session() as sess:
     # tf.initialize_all_variables() no long valid from
@@ -125,16 +125,26 @@ with tf.Session() as sess:
     sess.run(init)
     step = 0
     while step * batch_size < training_iters:
-        batch_xs, batch_ys = mnist.train.next_batch(batch_size)
+        # 每次128张图
+        # len(batch_xs) 为128 ， batch_xs[0]为 28*28=784像素，    len(batch_xs[0])为784
+        # len(batch_ys) 为128 ， batch_ys[0]为 数组 [0. 0. 0. 0. 0. 0. 0. 0. 1. 0.]
+        batch_xs, batch_ys = mnist.train.next_batch(batch_size)  # 每次读取数据
+
+
+
+        # 从 128 * 784 转为 128*28*28
+        # batch_xs = batch_xs.reshape([每次128图, 一张图28行, 一行输入28])
         batch_xs = batch_xs.reshape([batch_size, n_steps, n_inputs])
         sess.run([train_op], feed_dict={
-            x: batch_xs,
-            y: batch_ys,
+            x_f: batch_xs,
+            y_f: batch_ys,
         })
+
         if step % 20 == 0:
+            # print(weights['in'].eval() )  # 打印结果  # 保存模型上网搜索
             print(sess.run(accuracy, feed_dict={
-            x: batch_xs,
-            y: batch_ys,
+            x_f: batch_xs,
+            y_f: batch_ys,
             }))
         step += 1
 
