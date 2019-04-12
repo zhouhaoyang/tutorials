@@ -53,14 +53,15 @@ def RNN(X, weights, biases):
     ########################################
 
     # transpose the inputs shape from
-    # X ==> (128 batch * 28 steps, 28 inputs)
-    X = tf.reshape(X, [-1, n_inputs])
+    # X ==> (128 batch * 28 steps, 28 inputs)  
+    X = tf.reshape(X, [-1, n_inputs]) # 变成输入3584行，每行28个像素
 
     # into hidden
     # X_in = (128 batch * 28 steps, 128 hidden)
-    X_in = tf.matmul(X, weights['in']) + biases['in']
+    X_in = tf.matmul(X, weights['in']) + biases['in']  # 此处是二维数据
+
     # X_in ==> (128 batch, 28 steps, 128 hidden)
-    X_in = tf.reshape(X_in, [-1, n_steps, n_hidden_units])
+    X_in = tf.reshape(X_in, [-1, n_steps, n_hidden_units]) # 又转成三维数据
 
     # cell
     ##########################################
@@ -82,9 +83,18 @@ def RNN(X, weights, biases):
     # dynamic_rnn receive Tensor (batch, steps, inputs) or (steps, batch, inputs) as X_in.
     # Make sure the time_major is changed accordingly.
     outputs, final_state = tf.nn.dynamic_rnn(cell, X_in, initial_state=init_state, time_major=False)
+    # # X_in ==> (128 batch, 28 steps, 128 hidden)  这里时间维度不是major 128batch， 而是 28 steps 所以写time_major=False
+    #                                               如果时间维度是X_in第一个 ，那么要写 time_major=True
+
 
     # hidden layer for output as the final results
     #############################################
+    # 说明
+    # tf.transpose(outputs, [1, 0, 2]) 变成 list [(batch, outputs)..] * steps
+    # outputs[-1]  是说28行每行都有历史结果，把最后一行的综合结果作为最终结果
+
+
+
     # results = tf.matmul(final_state[1], weights['out']) + biases['out']
 
     # # or
