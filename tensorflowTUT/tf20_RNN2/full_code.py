@@ -20,25 +20,26 @@ mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 
 # hyperparameters
 lr = 0.001  # learning_rate=0.001  是移动大小
-training_iters = 100000
-batch_size = 128
+training_iters = 100000 # 训练循环次数
+batch_size = 128  # 每一步， step+1 则训练这么多
 
-n_inputs = 28   # MNIST data input (img shape: 28*28)
-n_steps = 28    # time steps
-n_hidden_units = 128   # neurons in hidden layer
+n_inputs = 28 # 每行有28个像素  # MNIST data input (img shape: 28*28)
+n_steps = 28  # 每次进来28个行  # time steps
+n_hidden_units = 128   # 隐藏层有多少神经元 # neurons in hidden layer
 n_classes = 10      # MNIST classes (0-9 digits)
 
 # tf Graph input
-x = tf.placeholder(tf.float32, [None, n_steps, n_inputs])
-y = tf.placeholder(tf.float32, [None, n_classes])
+x = tf.placeholder(tf.float32, [None, n_steps, n_inputs])  # x:  占位符 # 入参输入数据  # [None, 3]表示列是3，行不定
+y = tf.placeholder(tf.float32, [None, n_classes])        # y:  # 输出 0-9
 
-# Define weights
+# Define weights  # 每个RNN cell 在输入in 和输出out 需要权重
 weights = {
-    # (28, 128)
+    # (28, 128) # 从28像素到128神经元   连线   # 每次/行 有28个元素像素， 每个元素像素有 128神经元
     'in': tf.Variable(tf.random_normal([n_inputs, n_hidden_units])),
-    # (128, 10)
+    # (128, 10)  # 从128神经元到10个可能值   连线
     'out': tf.Variable(tf.random_normal([n_hidden_units, n_classes]))
 }
+# 除了权重还有偏移
 biases = {
     # (128, )
     'in': tf.Variable(tf.constant(0.1, shape=[n_hidden_units, ])),
